@@ -120,3 +120,5 @@ ENV/
 env/
 env.bak/
 venv.bak/
+
+my-env/

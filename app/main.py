@@ -1,24 +1,8 @@
-import json
-from fastapi import FastAPI, Depends
-from sqlalchemy.orm import Session
-from typing import List
+import streamlit as st
 
-from . import models
-from app.models.launch import LaunchCreate, LaunchRead, get_db
+def main():
+    st.title("My Streamlit App")
+    st.write("Welcome to your Streamlit app base!")
 
-app = FastAPI()
-
-@app.post("/schedule", response_model=LaunchRead)
-def schedule_launch(launch: LaunchCreate, db: Session = Depends(get_db)):
-    db_launch = models.Launch(rocket_name=launch.rocket_name, launch_date=launch.launch_date)
-    db.add(db_launch)
-    db.commit()
-    db.refresh(db_launch)
-    return db_launch
-
-
-@app.get("/launches")
-def get_launches(db: Session = Depends(get_db)):
-    return json.dumps({
-        "status": 200
-    })
+if __name__ == "__main__":
+    main()
