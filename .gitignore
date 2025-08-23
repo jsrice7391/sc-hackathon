@@ -122,3 +122,6 @@ env.bak/
 venv.bak/
 
 my-env/
+
+
+.terraform/

@@ -1,2 +1,4 @@
 psutil
 streamlit
+requests
+boto3 
