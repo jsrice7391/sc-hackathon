@@ -159,6 +159,7 @@ if __name__ == "__main__":
         with open(args.input, "r") as f:
             data = json.load(f)
         spec = create_spectrogram(extract_ecg_data(data, args.input))
+        print("create_spectrogram complete")
     else:
         spec = np.load(args.input)
 
