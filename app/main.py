@@ -1,14 +1,21 @@
 import streamlit as st
-import requests
+import boto3
+import json
+import os
+
 
 def get_sagemaker_endpoint():
-    try:
-        response = requests.get("https://pokeapi.co/api/v2/pokemon/ditto")
-        response.raise_for_status()  # Raise an error for HTTP errors
-        return response.json()
-    except requests.RequestException as e:
-        print(f"Error fetching SageMaker endpoint: {e}")
-        return None
+    client = boto3.client("sagemaker-runtime",
+                           aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+                           aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+                           region_name="us-east-1")
+    response = client.invoke_endpoint(
+        EndpointName="pytorch-inference-2025-08-24-12-56-47-523",
+        ContentType="application/json",
+        Body=json.dumps({"key": "value"})
+    )
+    return json.loads(response["Body"].read())
+
 
 def main():
     st.title("My Streamlit App")

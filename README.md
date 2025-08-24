@@ -45,3 +45,13 @@ EXPOSE 8501
 
 CMD ["streamlit", "run", "app.py", "--server.port=8501", "--server.address=0.0.0.0"]
 ```
+
+
+## Image
+
+Image gets placed in s3
+
+- Step function takes s3 image
+- S3 image 
+
+- JSON

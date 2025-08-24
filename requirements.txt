@@ -1,4 +1,6 @@
 psutil
 streamlit
 requests
-boto3 
+boto3
+plotly
+streamlit_echarts
