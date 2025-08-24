@@ -1,0 +1,33 @@
+# Base Python image
+FROM pytorch/pytorch:2.8.0-cuda12.9-cudnn9-runtime
+
+# Set working directory
+WORKDIR /app
+
+# Install system dependencies for OpenCV + PyTorch
+RUN apt-get update && apt-get install -y \
+    libgl1 \
+    libglib2.0-0 \
+    libomp-dev \
+    ffmpeg \
+    git \
+    && rm -rf /var/lib/apt/lists/*
+
+# Copy requirements and install
+COPY requirements.txt .
+RUN pip install --no-cache-dir -r requirements.txt
+
+ENV YOLO_CONFIG_DIR=/tmp/ultralytics
+
+# Copy code (but NOT the potentially corrupted model files)
+COPY . .
+
+# Download fresh model at build time
+RUN python -c "from ultralytics import YOLO; YOLO('yolov8n-cls.pt')" && \
+    echo "Model downloaded successfully"
+
+# Expose port
+EXPOSE 8000
+
+# Run FastAPI
+CMD ["uvicorn", "app:app", "--host", "0.0.0.0", "--port", "8000"]
