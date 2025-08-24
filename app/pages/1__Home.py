@@ -677,86 +677,10 @@ else:
             """, unsafe_allow_html=True)
     
     # Tabbed interface for different views
-    tab1, tab2, tab3, tab4 = st.tabs(["📈 ECG Waveform", "💓 Heart Rate Analysis", "📊 HRV Analysis", "🏥 Clinical Report"])
-
+    tab1, tab2, tab3, tab4 = st.tabs(["🏥 Clinical Report", "📈 ECG Waveform", "💓 Heart Rate Analysis", "📊 HRV Analysis"])
+    
     with tab1:
-        st.subheader("Real-time ECG Visualization")
-        
-        # Main ECG chart using ECharts
-        if st.session_state.analysis:
-            ecg_options = create_echarts_ecg(
-                st.session_state.time_data, 
-                st.session_state.ecg_data, 
-                st.session_state.current_time,
-                st.session_state.analysis['peaks']
-            )
-            st_echarts(options=ecg_options, height="500px", key="ecg_chart")
-            
-            # Current position info
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                st.metric("Current Time", f"{st.session_state.current_time:.1f}s")
-            with col2:
-                current_idx = int(st.session_state.current_time * st.session_state.analysis['sample_rate'])
-                if current_idx < len(st.session_state.ecg_data):
-                    st.metric("Current Amplitude", f"{st.session_state.ecg_data[current_idx]:.3f}mV")
-                else:
-                    st.metric("Current Amplitude", "N/A")
-            with col3:
-                progress = (st.session_state.current_time / st.session_state.analysis['duration']) * 100
-                st.metric("Progress", f"{progress:.1f}%")
-    
-    with tab2:
-        st.subheader("Heart Rate Trend Analysis")
-        
-        if st.session_state.analysis and st.session_state.analysis['rr_intervals']:
-            # Calculate beat-to-beat heart rates
-            rr_intervals = st.session_state.analysis['rr_intervals']
-            heart_rates = [60/rr for rr in rr_intervals if rr > 0]
-            
-            if heart_rates:
-                hr_options = create_heart_rate_chart(rr_intervals, heart_rates)
-                st_echarts(options=hr_options, height="400px", key="hr_chart")
-                
-                # Statistics
-                col1, col2, col3, col4 = st.columns(4)
-                with col1:
-                    st.metric("Average HR", f"{np.mean(heart_rates):.1f} BPM")
-                with col2:
-                    st.metric("Min HR", f"{np.min(heart_rates):.1f} BPM")
-                with col3:
-                    st.metric("Max HR", f"{np.max(heart_rates):.1f} BPM")
-                with col4:
-                    st.metric("HR Range", f"{np.max(heart_rates) - np.min(heart_rates):.1f} BPM")
-        else:
-            st.info("No heart rate data available for analysis.")
-    
-    with tab3:
-        st.subheader("Heart Rate Variability Analysis")
-        
-        if st.session_state.analysis and st.session_state.analysis['rr_intervals']:
-            rr_intervals = st.session_state.analysis['rr_intervals']
-            
-            hrv_options = create_hrv_chart(rr_intervals)
-            st_echarts(options=hrv_options, height="400px", key="hrv_chart")
-            
-            # HRV Metrics
-            col1, col2, col3 = st.columns(3)
-            with col1:
-                rmssd = np.sqrt(np.mean(np.diff(rr_intervals)**2)) * 1000
-                st.metric("RMSSD", f"{rmssd:.1f} ms", help="Root Mean Square of Successive Differences")
-            with col2:
-                sdnn = np.std(rr_intervals) * 1000
-                st.metric("SDNN", f"{sdnn:.1f} ms", help="Standard Deviation of NN intervals")
-            with col3:
-                pnn50 = (np.sum(np.abs(np.diff(rr_intervals)) > 0.05) / len(np.diff(rr_intervals))) * 100
-                st.metric("pNN50", f"{pnn50:.1f}%", help="Percentage of successive RR intervals that differ by more than 50ms")
-        else:
-            st.info("No HRV data available for analysis.")
-    
-    with tab4:
         st.subheader("Clinical Analysis Report")
-        
         if st.session_state.analysis:
             analysis = st.session_state.analysis
             
@@ -851,27 +775,27 @@ else:
             with export_col1:
                 # Generate report summary
                 report_summary = f"""
-ECG Analysis Report
-Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
+                ECG Analysis Report
+                Generated: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
 
-PATIENT DATA:
-- Recording Duration: {analysis['duration']:.2f} seconds
-- Sample Rate: {analysis['sample_rate']:.1f} Hz
+                PATIENT DATA:
+                - Recording Duration: {analysis['duration']:.2f} seconds
+                - Sample Rate: {analysis['sample_rate']:.1f} Hz
 
-CARDIAC METRICS:
-- Heart Rate: {analysis['heart_rate']} BPM
-- Rhythm: {analysis['rhythm']}
-- Rhythm Regularity: {analysis['rhythm_regularity']}
-- Heart Rate Variability: {analysis['hrv']:.1f} ms
+                CARDIAC METRICS:
+                - Heart Rate: {analysis['heart_rate']} BPM
+                - Rhythm: {analysis['rhythm']}
+                - Rhythm Regularity: {analysis['rhythm_regularity']}
+                - Heart Rate Variability: {analysis['hrv']:.1f} ms
 
-CLINICAL INTERPRETATION:
-{analysis['interpretation']}
+                CLINICAL INTERPRETATION:
+                {analysis['interpretation']}
 
-ALERTS:
-{chr(10).join(f"- {alert}" for alert in analysis['alerts']) if analysis['alerts'] else "No alerts"}
+                ALERTS:
+                {chr(10).join(f"- {alert}" for alert in analysis['alerts']) if analysis['alerts'] else "No alerts"}
 
-RECOMMENDATIONS:
-{chr(10).join(f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1))}
+                RECOMMENDATIONS:
+                {chr(10).join(f"{i}. {rec}" for i, rec in enumerate(analysis['recommendations'], 1))}
                 """
                 
                 st.download_button(
@@ -919,6 +843,82 @@ RECOMMENDATIONS:
                     mime="application/json"
                 )
 
+    with tab2:
+        st.subheader("Real-time ECG Visualization")
+        
+        # Main ECG chart using ECharts
+        if st.session_state.analysis:
+            ecg_options = create_echarts_ecg(
+                st.session_state.time_data, 
+                st.session_state.ecg_data, 
+                st.session_state.current_time,
+                st.session_state.analysis['peaks']
+            )
+            st_echarts(options=ecg_options, height="500px", key="ecg_chart")
+            
+            # Current position info
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                st.metric("Current Time", f"{st.session_state.current_time:.1f}s")
+            with col2:
+                current_idx = int(st.session_state.current_time * st.session_state.analysis['sample_rate'])
+                if current_idx < len(st.session_state.ecg_data):
+                    st.metric("Current Amplitude", f"{st.session_state.ecg_data[current_idx]:.3f}mV")
+                else:
+                    st.metric("Current Amplitude", "N/A")
+            with col3:
+                progress = (st.session_state.current_time / st.session_state.analysis['duration']) * 100
+                st.metric("Progress", f"{progress:.1f}%")
+    
+    with tab3:
+        st.subheader("Heart Rate Trend Analysis")
+        
+        if st.session_state.analysis and st.session_state.analysis['rr_intervals']:
+            # Calculate beat-to-beat heart rates
+            rr_intervals = st.session_state.analysis['rr_intervals']
+            heart_rates = [60/rr for rr in rr_intervals if rr > 0]
+            
+            if heart_rates:
+                hr_options = create_heart_rate_chart(rr_intervals, heart_rates)
+                st_echarts(options=hr_options, height="400px", key="hr_chart")
+                
+                # Statistics
+                col1, col2, col3, col4 = st.columns(4)
+                with col1:
+                    st.metric("Average HR", f"{np.mean(heart_rates):.1f} BPM")
+                with col2:
+                    st.metric("Min HR", f"{np.min(heart_rates):.1f} BPM")
+                with col3:
+                    st.metric("Max HR", f"{np.max(heart_rates):.1f} BPM")
+                with col4:
+                    st.metric("HR Range", f"{np.max(heart_rates) - np.min(heart_rates):.1f} BPM")
+        else:
+            st.info("No heart rate data available for analysis.")
+    
+    with tab4:
+        st.subheader("Heart Rate Variability Analysis")
+        
+        if st.session_state.analysis and st.session_state.analysis['rr_intervals']:
+            rr_intervals = st.session_state.analysis['rr_intervals']
+            
+            hrv_options = create_hrv_chart(rr_intervals)
+            st_echarts(options=hrv_options, height="400px", key="hrv_chart")
+            
+            # HRV Metrics
+            col1, col2, col3 = st.columns(3)
+            with col1:
+                rmssd = np.sqrt(np.mean(np.diff(rr_intervals)**2)) * 1000
+                st.metric("RMSSD", f"{rmssd:.1f} ms", help="Root Mean Square of Successive Differences")
+            with col2:
+                sdnn = np.std(rr_intervals) * 1000
+                st.metric("SDNN", f"{sdnn:.1f} ms", help="Standard Deviation of NN intervals")
+            with col3:
+                pnn50 = (np.sum(np.abs(np.diff(rr_intervals)) > 0.05) / len(np.diff(rr_intervals))) * 100
+                st.metric("pNN50", f"{pnn50:.1f}%", help="Percentage of successive RR intervals that differ by more than 50ms")
+        else:
+            st.info("No HRV data available for analysis.")
+    
+    
 # Real-time status bar at bottom
 if st.session_state.ecg_data is not None:
     st.markdown("---")
