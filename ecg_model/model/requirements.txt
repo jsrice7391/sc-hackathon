@@ -1,1 +1,5 @@
-ultralytics==8.3.184
+ultralytics
+fastapi
+uvicorn[standard]
+numpy<2
+python-multipart

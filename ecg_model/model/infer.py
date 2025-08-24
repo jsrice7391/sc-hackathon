@@ -30,7 +30,7 @@ class YOLO12Channel(nn.Module):
     def __init__(self, yolo_model_path='yolov8n-cls.pt', num_classes=2):
         super().__init__()
         self.channel_converter = ChannelConverter()
-        yolo_wrapper = YOLO(yolo_model_path)
+        yolo_wrapper = YOLO(yolo_model_path or "yolov8n-cls.pt")
         self.yolo_model = yolo_wrapper.model
         self.modify_yolo_head(num_classes)
     def modify_yolo_head(self, num_classes):
