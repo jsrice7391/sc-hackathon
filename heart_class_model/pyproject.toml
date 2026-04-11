@@ -1,0 +1,18 @@
+[project]
+name = "heart-class-model"
+version = "0.1.0"
+description = "PTB-XL ECG dataset preprocessing and EDA pipeline"
+requires-python = ">=3.10"
+dependencies = [
+    "wfdb>=4.0",
+    "pandas>=2.0",
+    "numpy>=1.24",
+    "matplotlib>=3.7",
+    "tqdm>=4.65",
+]
+
+[tool.uv]
+# This directory contains scripts, not a Python package.
+# uv will create .venv and install dependencies, but won't try to build/install
+# this project itself as a wheel.
+package = false
